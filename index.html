@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auto Generate Description</title>
+    <!-- Use Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Header -->
+    <nav class="navbar navbar-dark bg-primary">
+      <div class="container justify-content-center">
+        <a class="navbar-brand fw-bolder text-uppercase fs-3" href="#"
+          >Auto Generate Description</a
+        >
+      </div>
+    </nav>
+    <!-- End Header -->
+
+    <!-- Content -->
+    <div class="container my-5" style="max-width: 500px">
+      <div class="mb-3">
+        <label for="store" class="form-label fw-bolder">Nama Toko</label>
+        <input
+          type="text"
+          class="form-control"
+          id="store"
+          placeholder="Masukkan Nama Toko"
+          oninput="updateStore()"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="name" class="form-label fw-bolder">Nama Produk</label>
+        <input
+          type="text"
+          class="form-control"
+          id="name"
+          placeholder="Masukkan Nama Produk"
+          oninput="updateLabel()"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="results" class="form-label fw-bolder" id="titleLabel"
+          >Deskripsi Untuk
+        </label>
+        <textarea
+          class="form-control"
+          rows="15"
+          id="results"
+          readonly
+        ></textarea>
+      </div>
+      <div class="btn-group w-100">
+        <button
+          type="button"
+          class="fw-bolder btn btn-lg btn-primary w-100 text-uppercase"
+          onclick="generateDescription()"
+        >
+          Generate
+        </button>
+        <button
+          type="button"
+          class="fw-bolder btn btn-lg btn-success w-auto text-uppercase"
+          onclick="copyToClipboard()"
+        >
+          Copy
+        </button>
+      </div>
+    </div>
+    <!-- Content End -->
+
+    <!-- Use Bootstrap Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Script -->
+    <script>
+      var currentFileIndex = 1;
+      var numberOfFiles = 10;
+
+      function generateDescription() {
+        var productName = document.getElementById("name").value;
+        var storeName = document.getElementById("store").value; // Ambil nilai Nama Toko
+        var filename = "content/content-" + currentFileIndex + ".txt";
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            var content = xhr.responseText;
+
+            // Ganti [SERI] dengan nilai input nama produk
+            content = content.replace(/\[SERI\]/g, productName);
+
+            // Ganti [Nama Toko] dengan nilai input Nama Toko
+            content = content.replace(/\[Nama Toko\]/g, storeName);
+
+            document.getElementById("results").value = content;
+            currentFileIndex = (currentFileIndex % numberOfFiles) + 1;
+          }
+        };
+        xhr.open("GET", filename, true);
+        xhr.send();
+      }
+
+      function updateLabel() {
+        var productName = document.getElementById("name").value;
+        document.getElementById("titleLabel").innerText =
+          "Deskripsi Untuk " + productName;
+      }
+
+      function updateStore() {
+        var storeName = document.getElementById("store").value;
+        document.getElementById("titleLabel").innerText =
+          "Deskripsi Untuk " + storeName;
+      }
+
+      function copyToClipboard() {
+        var copyText = document.getElementById("results");
+        copyText.select();
+        document.execCommand("copy");
+
+        // Tampilkan notifikasi bootstrap
+        var alertDiv = document.createElement("div");
+        alertDiv.classList.add(
+          "alert",
+          "alert-success",
+          "mt-3",
+          "fade",
+          "show"
+        );
+        alertDiv.role = "alert";
+        alertDiv.innerHTML = "Deskripsi berhasil di-copy!";
+        document.body.appendChild(alertDiv);
+
+        // Hilangkan notifikasi setelah beberapa detik
+        setTimeout(function () {
+          alertDiv.remove();
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>
